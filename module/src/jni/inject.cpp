@@ -60,7 +60,7 @@ static void delay_start_up(uint64_t start_up_delay_ms) {
     std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 
     for (int i = countdown; i > 0; i--) {
-        LOGI("Injecting libs in %d seconds", i);
+        LOGI("Injecting libs in %d 秒", i);
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
