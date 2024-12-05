@@ -68,7 +68,9 @@ static void delay_start_up(uint64_t start_up_delay_ms) {
 void inject_lib(std::string const &lib_path, std::string const &logContext) {
     auto *handle = xdl_open(lib_path.c_str(), XDL_TRY_FORCE_LOAD);
     if (handle) {
-        LOGI("%sInjected %s with handle %p", logContext.c_str(), lib_path.c_str(), handle);
+        LOGI("%s 注入 xdl_open %s with 句柄 handle %p", logContext.c_str(), lib_path.c_str(), handle);
+        void *JNIload = xdl_sym(handle, "JNI_OnLoad", nullptr);
+        LOGI("JNIload %p",JNIload);
         remap_lib(lib_path);
         return;
     }
@@ -77,15 +79,17 @@ void inject_lib(std::string const &lib_path, std::string const &logContext) {
 
     handle = dlopen(lib_path.c_str(), RTLD_NOW);
     if (handle) {
-        LOGI("%sInjected %s with handle %p (dlopen)", logContext.c_str(), lib_path.c_str(), handle);
+        LOGI("%s 注入dlopen %s with 句柄 handle %p (dlopen)", logContext.c_str(), lib_path.c_str(), handle);
+        void *JNIload2 = dlsym(handle, "JNI_OnLoad", nullptr);
+        LOGI("JNIload2 %p",JNIload2);
         remap_lib(lib_path);
         return;
     }
 
     auto dl_err = dlerror();
 
-    LOGE("%sFailed to inject %s (xdl_open): %s", logContext.c_str(), lib_path.c_str(), xdl_err);
-    LOGE("%sFailed to inject %s (dlopen): %s", logContext.c_str(), lib_path.c_str(), dl_err);
+    LOGE("%s 失败 to inject %s (xdl_open): %s", logContext.c_str(), lib_path.c_str(), xdl_err);
+    LOGE("%s 失败 to inject %s (dlopen): %s", logContext.c_str(), lib_path.c_str(), dl_err);
 }
 
 static void inject_libs(target_config const &cfg) {
